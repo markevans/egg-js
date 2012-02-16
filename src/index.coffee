@@ -1,0 +1,12 @@
+#= require ./core_ext
+#= require ./init
+#= require ./publisher
+#= require ./events
+#= require ./base
+#= require ./rest_api
+#= require ./model
+#= require ./active_record
+#= require ./scope
+#= require ./model_index
+#= require ./view
+#= require ./js_model_view
