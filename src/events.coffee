@@ -1,5 +1,3 @@
-eventsIDCounter = 0
-
 instanceMethods =
 
   emit: (name, params)->
@@ -15,12 +13,6 @@ instanceMethods =
 
   silently: (callback)->
     egg.silently(callback, @)
-
-  eventsID: ()->
-    if @constructor.name == 'Function' && @name.length
-      @name
-    else
-      @_eventsID ?= "#{@constructor.name}-#{eventsIDCounter++}"
 
 egg.Events = (klass)->
   klass.include(instanceMethods)

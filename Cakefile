@@ -46,5 +46,6 @@ task 'minify', 'Minify the resulting application file after build', ->
 # Build tests
 task 'build_tests', 'Build tests from source files', ->
   build [
+    'test/src/base'
     'test/src/scope'
   ], 'test/tests'

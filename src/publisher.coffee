@@ -47,13 +47,13 @@ class egg.Publisher
       if sender
         for obj in ancestorChain(sender)
           break if !event.shouldBubble
-          @runChannelCallbacks(@channels[obj.eventsID()], event)
+          @runChannelCallbacks(@channels[obj.eggID()], event)
       @runChannelCallbacks(@globalChannel, event) if event.shouldBubble
       true
     
   on: (name, callback, filter, sender)=>
     channel = if sender
-      @channels[sender.eventsID()] ?= {}
+      @channels[sender.eggID()] ?= {}
     else
       @globalChannel
     channel[name] ?= []

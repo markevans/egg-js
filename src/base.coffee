@@ -1,3 +1,5 @@
+eggIDCounter = 0
+
 class egg.Base
 
   @include: (obj)->
@@ -54,3 +56,9 @@ class egg.Base
 
   className: ->
     @constructor.name
+
+  @eggID: ->
+    @name
+
+  eggID: ->
+    @_eggID ?= "#{@constructor.name}-#{eggIDCounter++}"
