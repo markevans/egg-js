@@ -12,5 +12,8 @@ describe 'egg.Base', ->
       expect(BabyDobbins.eggID()).toEqual('BabyDobbins')
 
     it "should give instances a unique eggID", ->
-      expect(Dobbins.create().eggID()).toEqual('Dobbins-1')
-      expect(Dobbins.create().eggID()).toEqual('Dobbins-2')
+      id1 = Dobbins.create().eggID()
+      id2 = Dobbins.create().eggID()
+      expect(id1).toMatch(/^Dobbins-\d+$/)
+      expect(id2).toMatch(/^Dobbins-\d+$/)
+      expect(id1).toNotEqual(id2)

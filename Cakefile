@@ -25,6 +25,7 @@ task 'build', 'Build single application file from source files', ->
   build [
     'src/core_ext'
     'src/init'
+    'src/set'
     'src/publisher'
     'src/events'
     'src/base'
@@ -47,5 +48,6 @@ task 'minify', 'Minify the resulting application file after build', ->
 task 'build_tests', 'Build tests from source files', ->
   build [
     'test/src/base'
+    'test/src/set'
     'test/src/scope'
   ], 'test/tests'
