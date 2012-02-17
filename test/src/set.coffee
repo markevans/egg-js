@@ -32,3 +32,9 @@ describe 'egg.Set', ->
     set.remove b1
     expect(set.has(b1)).toBeFalsy()
     expect(set.count()).toEqual(1)
+
+  it "should not add things twice", ->
+    bean = Bean.create()
+    set.add bean
+    set.add bean
+    expect(set.count())toEqual(1)
