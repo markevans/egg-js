@@ -28,7 +28,7 @@ egg.model = (klass)->
       )
 
     find: (attrs)->
-      index = egg.ModelIndex.for(@, Object.keys(attrs))
+      index = egg.Index.for(@, Object.keys(attrs))
       if index
         index.find(attrs)
       else
@@ -43,7 +43,7 @@ egg.model = (klass)->
       @all().forEach (model)-> model.destroy()
 
     index: (attrNames...)->
-      egg.ModelIndex.create(modelClass: @, attrNames: attrNames)
+      egg.Index.create(modelClass: @, attrNames: attrNames)
 
     count: ->
       @all().count()

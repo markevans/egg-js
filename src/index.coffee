@@ -1,7 +1,7 @@
 rootKeyFor = (attrNames)->
   attrNames.sort().join('-')
 
-class egg.ModelIndex extends egg.Base
+class egg.Index extends egg.Base
   
   @indexes = {}
   
@@ -19,14 +19,14 @@ class egg.ModelIndex extends egg.Base
   
     # Bind to model changes
     @modelClass.on 'init', (params)=>
-      @addToIndex(params.instance, params.instance.attrs())
+      @add(params.instance, params.instance.attrs())
     
     @modelClass.on 'change', (params)=>
-      @removeFromIndex(params.instance, params.from)
-      @addToIndex(params.instance, params.to)
+      @remove(params.instance, params.from)
+      @add(params.instance, params.to)
 
     @modelClass.on 'destroy', (params)=>
-      @removeFromIndex(params.instance, params.instance.attrs())
+      @remove(params.instance, params.instance.attrs())
 
   modelKey: (attrs)->
     values = []
@@ -35,10 +35,15 @@ class egg.ModelIndex extends egg.Base
     values.join('-')
   
   find: (attrs)->
-    @models[@modelKey(attrs)]
+    @where(attrs).takeOne()
+
+  where: (attrs)->
+    @models[@modelKey(attrs)] ?= new egg.Set
+
+  add: (model, attrs)->
+    set = @models[@modelKey(attrs)] ?= new egg.Set
+    set.add(model)
   
-  addToIndex: (model, attrs)->
-    @models[@modelKey(attrs)] = model
-  
-  removeFromIndex: (model, attrs)->
-    delete @models[@modelKey(attrs)]
+  remove: (model, attrs)->
+    set = @models[@modelKey(attrs)]
+    set.remove(model) if set

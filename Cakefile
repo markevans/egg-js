@@ -33,7 +33,7 @@ task 'build', 'Build single application file from source files', ->
     'src/model'
     'src/active_record'
     'src/scope'
-    'src/model_index'
+    'src/index'
     'src/view'
     'src/js_model_view'
   ], 'lib/egg'
@@ -49,5 +49,6 @@ task 'build_tests', 'Build tests from source files', ->
   build [
     'test/src/base'
     'test/src/set'
+    'test/src/index'
     'test/src/scope'
   ], 'test/tests'
