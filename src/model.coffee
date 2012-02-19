@@ -18,21 +18,23 @@ egg.model = (klass)->
       storage.load(@, opts).done (instances) =>
         @emit('load', from: storage, instances: instances, opts: opts)
 
+    filter: (callback)->
+      set = new egg.Set
+      @instances().forEach (instance)=> set.add instance if callback(instance)
+      set
+
     where: (attrs)->
-      egg.Scope.create(
-        modelClass: @
-        filter: (model)->
+      index = egg.Index.for(@, Object.keys(attrs))
+      if index
+        index.where(attrs)
+      else
+        @filter (model)->
           for key, value of attrs
             return false if model.get(key) != value
           return true
-      )
 
     find: (attrs)->
-      index = egg.Index.for(@, Object.keys(attrs))
-      if index
-        index.find(attrs)
-      else
-        @where(attrs).first()
+      @where(attrs).one()
     
     findOrCreate: (attrs)->
       @find(attrs) || @create(attrs: attrs)

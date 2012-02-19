@@ -49,6 +49,7 @@ task 'build_tests', 'Build tests from source files', ->
   build [
     'test/src/base'
     'test/src/set'
+    'test/src/model'
     'test/src/index'
     'test/src/scope'
   ], 'test/tests'
