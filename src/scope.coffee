@@ -1,92 +1,50 @@
 class egg.Scope extends egg.Base
 
-  @use egg.Events
-
   @init (opts={})->
     @sorter = opts.sorter
     @filter = opts.filter || -> true
-    @modelClass = opts.modelClass
-    throw("Scope needs a modelClass") unless @modelClass
+    @parent = opts.parent
+    throw("Scope needs a parent") unless @parent
     
-    @instances = {}
+    @_instances = new egg.Set
     @_populateInstances()
 
     # Events
     @subs = []
-    @subs.push @modelClass.on 'init', (params) =>
+    @subs.push @parent.on 'add', (params) =>
       @_add(params.instance) if @filter(params.instance)
       
-    @subs.push @modelClass.on 'change', (params) =>
-      model = params.instance
-      
-      if @filter(model)
-        if @has(model)
+    @subs.push @parent.on 'change', (params) =>
+      instance = params.instance
+      if @filter(instance)
+        if @has(instance)
           @emit 'change', params
         else
-          @_add(model)
+          @_add(instance)
       else
-        if @has(model)
-          @_remove(model)
+        if @has(instance)
+          @_remove(instance)
       
-    @subs.push @modelClass.on 'destroy', (params) =>
+    @subs.push @parent.on 'remove', (params) =>
       @_remove(params.instance) if @has(params.instance)
 
   @destroy ->
     sub.cancel() for sub in @subs
 
   _populateInstances: ->
-    for id, model of @modelClass.instances
-      @instances[id] = model if @filter(model)
+    @parent.instances().forEach (instance)=>
+      @instances().add instance if @filter(instance)
 
-  _add: (model)->
-    @instances[model.id] = model
-    @emit 'add', instance: model
+  _add: (instance)->
+    @emit 'add', instance: instance if @instances().add instance
 
-  _remove: (model)->
-    delete @instances[model.id]
-    @emit 'remove', instance: model
+  _remove: (instance)->
+    @emit 'remove', instance: instance if @instances().remove instance
 
-  has: (model)->
-    @instances[model.id]
+  instances: -> @_instances
 
-  forEach: (callback)->
-    callback(model) for model in @toArray()
+  @delegateTo 'instances', ['has', 'toArray']
 
-  toArray: ->
-    array = []
-    for id, model of @instances
-      array.push model
-    array.sort(@sorter) if @sorter
-    array
-
-  orderBy: (attr)->
-    sorter = (a, b)-> if a.get(attr) > b.get(attr) then 1 else -1
-    @constructor.create(modelClass: @modelClass, sorter: sorter, filter: @filter)
-  
-  indexOf: (i)->
-    @toArray().indexOf(i)
-
-  first: ->
-    @toArray()[0]
-
-  last: ->
-    array = @toArray()
-    array[array.length-1]
-
-  pluck: (attr)->
-    @toArray().map (model) -> model.get(attr)
-
-  sample: (attr)->
-    array = @toArray()
-    index = Math.floor(Math.random() * array.length)
-    model = array[index]
-    if attr then model.get(attr) else model
-
-  count: ->
-    @toArray().length
-
-  toJSON: ->
-    array = []
-    @forEach (model) ->
-      array.push model.toJSON()
-    array
+  # orderBy: (attr)->
+  #   sorter = (a, b)-> if a.get(attr) > b.get(attr) then 1 else -1
+  #   TODO

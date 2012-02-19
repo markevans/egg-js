@@ -26,6 +26,24 @@ class egg.Set
     array = []
     array.push v for k, v of @items
     array
-  
+
+  forEach: (callback)->
+    callback(v, k, @items) for k, v of @items
+
   takeOne: ->
     return v for k, v of @items
+
+  pluck: (attr)->
+    @toArray().map (model) -> model.get(attr)
+
+  sample: (attr)->
+    array = @toArray()
+    index = Math.floor(Math.random() * array.length)
+    model = array[index]
+    if attr then model.get(attr) else model
+
+  toJSON: ->
+    array = []
+    @forEach (model) ->
+      array.push model.toJSON()
+    array

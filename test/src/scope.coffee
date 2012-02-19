@@ -6,7 +6,7 @@ describe 'egg.Scope', ->
   describe 'correctly filtering', ->
 
     evens = egg.Scope.create(
-      modelClass: TestObject,
+      parent: TestObject
       filter: (model) -> model.get('num') % 2 == 0
     )
     a = null
@@ -26,10 +26,16 @@ describe 'egg.Scope', ->
     
     it "should include all the ones that meet the criteria if created later than the models", ->
       odds = egg.Scope.create(
-        modelClass: TestObject
+        parent: TestObject
         filter: (model) -> model.get('num') % 2 == 1
       )
       expect(odds.toArray()).toEqual([a, c])
+
+    it "should say if it has an item", ->
+      expect( evens.has(b) ).toEqual(true)
+
+    it "should say if it doesn't have an item", ->
+      expect( evens.has(a) ).toEqual(false)
 
     describe "when one of them subsequently fits the criteria", ->
       beforeEach ->
@@ -37,7 +43,7 @@ describe 'egg.Scope', ->
         a.set('num', 4)
       
       it "should be updated", ->
-        expect(evens.toArray()).toEqual([a, b, d])
+        expect(evens.toArray()).toEqual([b, d, a])
 
       it "should emit an added event", ->
         expect(evens.emit).toHaveBeenCalledWith('add', instance: a)

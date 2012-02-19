@@ -1,18 +1,18 @@
-uidCounter = 0
-
 egg.model = (klass)->
 
   klass.init (opts)->
     @_attrs = opts.attrs || {}
-    @id = uidCounter++
-    klass.instances[@id] = @
+    klass.instances().add(@)
+    klass.emit 'add', instance: @
 
   klass.destroy (opts)->
-    delete klass.instances[@id]
+    klass.instances().remove(@)
+    klass.emit 'remove', instance: @
 
   klass.extend
 
-    instances: {} # TODO: worry about inheritance
+    instances: ->
+      @classInstanceVars().instances ?= new egg.Set
 
     loadFrom: (storage, opts={})->
       storage.load(@, opts).done (instances) =>
@@ -37,10 +37,10 @@ egg.model = (klass)->
     findOrCreate: (attrs)->
       @find(attrs) || @create(attrs: attrs)
 
-    all: -> @classInstanceVars().all ?= egg.Scope.create(modelClass: @)
+    all: -> @classInstanceVars().all ?= egg.Scope.create(parent: @)
     
     destroyAll: ->
-      @all().forEach (model)-> model.destroy()
+      @instances().forEach (model)-> model.destroy()
 
     index: (attrNames...)->
       egg.Index.create(modelClass: @, attrNames: attrNames)

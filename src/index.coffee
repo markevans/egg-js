@@ -18,14 +18,14 @@ class egg.Index extends egg.Base
     @constructor.indexes[@modelClass.name][rootKeyFor(@attrNames)] = @
   
     # Bind to model changes
-    @modelClass.on 'init', (params)=>
+    @modelClass.on 'add', (params)=>
       @add(params.instance, params.instance.attrs())
     
     @modelClass.on 'change', (params)=>
       @remove(params.instance, params.from)
       @add(params.instance, params.to)
 
-    @modelClass.on 'destroy', (params)=>
+    @modelClass.on 'remove', (params)=>
       @remove(params.instance, params.instance.attrs())
 
   modelKey: (attrs)->
