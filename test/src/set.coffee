@@ -51,7 +51,7 @@ describe 'egg.Set', ->
     bean2 = Bean.create()
     set.add bean1
     set.add bean2
-    expect( set.takeOne() ).toEqual(bean1)
+    expect( set.one() ).toEqual(bean1)
 
   describe 'return values', ->
     bean = null

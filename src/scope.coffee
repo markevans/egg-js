@@ -31,6 +31,8 @@ class egg.Scope extends egg.Base
   @destroy ->
     sub.cancel() for sub in @subs
 
+  instances: -> @_instances
+
   _populateInstances: ->
     @parent.instances().forEach (instance)=>
       @instances().add instance if @filter(instance)
@@ -41,9 +43,16 @@ class egg.Scope extends egg.Base
   _remove: (instance)->
     @emit 'remove', instance: instance if @instances().remove instance
 
-  instances: -> @_instances
-
-  @delegateTo 'instances', ['has', 'toArray']
+  @delegateTo 'instances', [
+    'has'
+    'toArray'
+    'count'
+    'forEach'
+    'one'
+    'pluck'
+    'sample'
+    'toJSON'
+  ]
 
   # orderBy: (attr)->
   #   sorter = (a, b)-> if a.get(attr) > b.get(attr) then 1 else -1

@@ -30,7 +30,7 @@ class egg.Set
   forEach: (callback)->
     callback(v, k, @items) for k, v of @items
 
-  takeOne: ->
+  one: ->
     return v for k, v of @items
 
   pluck: (attr)->
