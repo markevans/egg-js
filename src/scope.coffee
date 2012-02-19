@@ -43,7 +43,7 @@ class egg.Scope extends egg.Base
   _remove: (instance)->
     @emit 'remove', instance: instance if @instances().remove instance
 
-  @delegateTo 'instances', [
+  @delegateInstanceMethodsTo 'instances', [
     'has'
     'toArray'
     'count'

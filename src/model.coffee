@@ -18,11 +18,6 @@ egg.model = (klass)->
       storage.load(@, opts).done (instances) =>
         @emit('load', from: storage, instances: instances, opts: opts)
 
-    filter: (callback)->
-      set = new egg.Set
-      @instances().forEach (instance)=> set.add instance if callback(instance)
-      set
-
     where: (attrs)->
       index = egg.Index.for(@, Object.keys(attrs))
       if index
@@ -47,14 +42,12 @@ egg.model = (klass)->
     index: (attrNames...)->
       egg.Index.create(modelClass: @, attrNames: attrNames)
 
-    count: ->
-      @all().count()
-    
-    sample: (attr)->
-      @all().sample(attr)
-
-    orderBy: (attr)->
-      @all().orderBy(attr)
+  klass.delegateTo 'instances', [
+    'filter'
+    'sample'
+    'orderBy'
+    'count'
+  ]
 
   klass.include
   

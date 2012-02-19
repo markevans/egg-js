@@ -1,5 +1,13 @@
 eggIDCounter = 0
 
+delegate = (object, ownMethod, methods)->
+  for method in methods
+    (->
+      meth = method
+      object[meth] = (args...)->
+        @[ownMethod]()[meth](args...)
+    )()
+
 class egg.Base
 
   @include: (obj)->
@@ -37,13 +45,11 @@ class egg.Base
         [@]
     )
   
+  @delegateInstanceMethodsTo: (ownMethod, methods)->
+    delegate(@::, ownMethod, methods)
+
   @delegateTo: (ownMethod, methods)->
-    for method in methods
-      (=>
-        meth = method
-        @::[meth] = (args...)->
-          @[ownMethod]()[meth](args...)
-      )()
+    delegate(@, ownMethod, methods)
 
   @create: (opts={})->
     new @(opts)

@@ -21,7 +21,12 @@ class egg.Set
 
   has: (item)->
     item.eggID && (item.eggID() of @items)
-  
+
+  filter: (callback)->
+    set = new @constructor
+    @forEach (item)=> set.add item if callback(item)
+    set
+
   toArray: ->
     array = []
     array.push v for k, v of @items
