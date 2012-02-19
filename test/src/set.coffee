@@ -53,46 +53,23 @@ describe 'egg.Set', ->
     set.add bean2
     expect( set.takeOne() ).toEqual(bean1)
 
-  describe 'events', ->
+  describe 'return values', ->
     bean = null
     
     beforeEach ->
       set = new egg.Set
       bean = Bean.create()
     
-    it "should say when something is added and someone is listening", ->
-      set.on 'add', ->
-      spyOn(set, 'emit')
-      set.add bean
-      expect(set.emit).toHaveBeenCalledWith('add', instance: bean)
-    
-    it "should not emit add if no-one is listening", ->
-      spyOn(set, 'emit')
-      set.add bean
-      expect(set.emit).not.toHaveBeenCalled()
+    it "should return true if added", ->
+      expect( set.add(bean) ).toBeTruthy()
 
-    it "should not emit add if it already belongs to the set", ->
+    it "should return false if already there", ->
       set.add bean
-      set.on 'add', ->
-      spyOn(set, 'emit')
-      set.add bean
-      expect(set.emit).not.toHaveBeenCalled()
+      expect( set.add(bean) ).toBeFalsy()
 
-    it "should say when something is removed and someone is listening", ->
+    it "should return true if removed", ->
       set.add bean
-      set.on 'remove', ->
-      spyOn(set, 'emit')
-      set.remove bean
-      expect(set.emit).toHaveBeenCalledWith('remove', instance: bean)
+      expect( set.remove(bean) ).toBeTruthy()
 
-    it "should not emit remove if no-one is listening", ->
-      set.add bean
-      spyOn(set, 'emit')
-      set.remove bean
-      expect(set.emit).not.toHaveBeenCalled()
-
-    it "should not emit remove if it didn't already belong to the set", ->
-      set.on 'remove', ->
-      spyOn(set, 'emit')
-      set.remove bean
-      expect(set.emit).not.toHaveBeenCalled()
+    it "should return false if not already there", ->
+      expect( set.remove(bean) ).toBeFalsy()

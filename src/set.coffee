@@ -1,6 +1,6 @@
-class egg.Set extends egg.Base
+class egg.Set
   
-  @init ->
+  constructor: ->
     @items = {}
   
   add: (item)->
@@ -8,13 +8,11 @@ class egg.Set extends egg.Base
     id = item.eggID()
     unless @items[id]
       @items[id] = item
-      @emit 'add', instance: item if @hasListeners
 
   remove: (item)->
     id = item.eggID()
     if @items[id]
       delete @items[id]
-      @emit 'remove', instance: item if @hasListeners
 
   count: ->
     i = 0
