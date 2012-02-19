@@ -4,6 +4,7 @@ instanceMethods =
     egg.publisher.emit(name, params, @)
 
   on: (args...)->
+    @hasListeners = true
     if args.length == 1
       for name, callback of args[0]
         egg.publisher.on(name, callback, null, @)

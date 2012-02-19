@@ -25,10 +25,10 @@ task 'build', 'Build single application file from source files', ->
   build [
     'src/core_ext'
     'src/init'
-    'src/set'
     'src/publisher'
     'src/events'
     'src/base'
+    'src/set'
     'src/rest_api'
     'src/model'
     'src/active_record'

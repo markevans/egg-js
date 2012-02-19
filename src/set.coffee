@@ -1,14 +1,20 @@
-class egg.Set
+class egg.Set extends egg.Base
   
-  constructor: ->
+  @init ->
     @items = {}
   
   add: (item)->
     throw "Can't add #{item.constructor.name} to set without an eggID" unless item.eggID
-    @items[item.eggID()] = item
+    id = item.eggID()
+    unless @items[id]
+      @items[id] = item
+      @emit 'add', instance: item if @hasListeners
 
   remove: (item)->
-    delete @items[item.eggID()]
+    id = item.eggID()
+    if @items[id]
+      delete @items[id]
+      @emit 'remove', instance: item if @hasListeners
 
   count: ->
     i = 0
