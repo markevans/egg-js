@@ -36,6 +36,14 @@ class egg.Base
       else
         [@]
     )
+  
+  @delegateTo: (ownMethod, methods)->
+    for method in methods
+      (=>
+        meth = method
+        @::[meth] = (args...)->
+          @[ownMethod]()[meth](args...)
+      )()
 
   @create: (opts={})->
     new @(opts)
