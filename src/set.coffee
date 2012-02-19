@@ -17,3 +17,11 @@ class egg.Set
 
   has: (item)->
     item.eggID && (item.eggID() of @items)
+  
+  toArray: ->
+    array = []
+    array.push v for k, v of @items
+    array
+  
+  takeOne: ->
+    return v for k, v of @items

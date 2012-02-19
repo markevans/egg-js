@@ -37,4 +37,19 @@ describe 'egg.Set', ->
     bean = Bean.create()
     set.add bean
     set.add bean
-    expect(set.count())toEqual(1)
+    expect(set.count()).toEqual(1)
+  
+  it "should give an array in the order added", ->
+    bean1 = Bean.create()
+    bean2 = Bean.create()
+    set.add bean1
+    set.add bean2
+    expect(set.toArray()).toEqual([bean1, bean2])
+
+  it "should allow taking one (in fact the first added)", ->
+    bean1 = Bean.create()
+    bean2 = Bean.create()
+    set.add bean1
+    set.add bean2
+    expect( set.takeOne() ).toEqual(bean1)
+    
