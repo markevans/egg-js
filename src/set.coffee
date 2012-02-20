@@ -37,6 +37,9 @@ class egg.Set
     new @constructor items: @toArray(), sorter: (a, b) ->
       if a.get(attr) < b.get(attr) then 1 else -1
 
+  sort: (sorter)->
+    new @constructor items: @toArray(), sorter: sorter
+
   toArray: ->
     return @array if @array
     array = []
