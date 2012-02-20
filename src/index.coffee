@@ -35,7 +35,7 @@ class egg.Index extends egg.Base
     values.join('-')
   
   find: (attrs)->
-    @where(attrs).one()
+    @where(attrs).first()
 
   where: (attrs)->
     @models[@modelKey(attrs)] ?= new egg.Set

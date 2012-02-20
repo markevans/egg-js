@@ -1,45 +1,58 @@
 class egg.Set
   
-  constructor: ->
+  constructor: (opts={})->
     @items = {}
+    if opts.items
+      @items[item.eggID()] = item for item in opts.items
+    @sorter = opts.sorter
   
   add: (item)->
-    throw "Can't add #{item.constructor.name} to set without an eggID" unless item.eggID
     id = item.eggID()
     unless @items[id]
       @items[id] = item
+      delete @array
 
   remove: (item)->
     id = item.eggID()
     if @items[id]
       delete @items[id]
+      delete @array
 
   count: ->
-    i = 0
-    i++ for k of @items
-    i
+    @toArray().length
 
   has: (item)->
     item.eggID && (item.eggID() of @items)
 
   filter: (callback)->
     set = new @constructor
-    @forEach (item)=> set.add item if callback(item)
+    @forEach (item) => set.add item if callback(item)
     set
 
+  asc: (attr)->
+    new @constructor items: @toArray(), sorter: (a, b) ->
+      if a.get(attr) > b.get(attr) then 1 else -1
+
+  desc: (attr)->
+    new @constructor items: @toArray(), sorter: (a, b) ->
+      if a.get(attr) < b.get(attr) then 1 else -1
+
   toArray: ->
+    return @array if @array
     array = []
     array.push v for k, v of @items
-    array
+    @array = if @sorter then array.sort(@sorter) else array
 
   forEach: (callback)->
-    callback(v, k, @items) for k, v of @items
+    array = @toArray()
+    callback(item, i, array) for item, i in @toArray()
 
-  one: ->
-    return v for k, v of @items
+  first: ->
+    @toArray()[0]
 
   pluck: (attr)->
-    @toArray().map (model) -> model.get(attr)
+    array = []
+    array.push model.get(attr) for model in @toArray()
 
   sample: (attr)->
     array = @toArray()

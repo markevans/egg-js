@@ -29,7 +29,7 @@ egg.model = (klass)->
           return true
 
     find: (attrs)->
-      @where(attrs).one()
+      @where(attrs).first()
     
     findOrCreate: (attrs)->
       @find(attrs) || @create(attrs: attrs)
@@ -44,8 +44,6 @@ egg.model = (klass)->
 
   klass.delegateTo 'instances', [
     'filter'
-    'sample'
-    'orderBy'
     'count'
   ]
 

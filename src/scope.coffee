@@ -48,12 +48,10 @@ class egg.Scope extends egg.Base
     'toArray'
     'count'
     'forEach'
-    'one'
+    'first'
     'pluck'
     'sample'
     'toJSON'
+    'asc'
+    'desc'
   ]
-
-  # orderBy: (attr)->
-  #   sorter = (a, b)-> if a.get(attr) > b.get(attr) then 1 else -1
-  #   TODO
