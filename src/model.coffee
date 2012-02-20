@@ -44,6 +44,7 @@ egg.model = (klass)->
 
   klass.delegateTo 'instances', [
     'filter'
+    'sample'
     'count'
   ]
 
