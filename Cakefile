@@ -24,6 +24,7 @@ build = (srcFiles, dest)->
 task 'build', 'Build single application file from source files', ->
   build [
     'src/core_ext'
+    'src/jquery_plugins'
     'src/init'
     'src/publisher'
     'src/events'
@@ -52,4 +53,5 @@ task 'build_tests', 'Build tests from source files', ->
     'test/src/model'
     'test/src/index'
     'test/src/scope'
+    'test/src/jquery_plugins'
   ], 'test/tests'
