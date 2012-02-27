@@ -11,24 +11,24 @@ egg.view = (klass)->
     delegatedEvents: ->
       @_delegatedEvents ?= {}
 
-    onObj: (eventName, callback)->
-      @objectSubscriptionSpecs()[eventName] =
+    onModel: (eventName, callback)->
+      @modelSubscriptionSpecs()[eventName] =
         eventName: eventName
         callback: callback
   
-    objectSubscriptionSpecs: ->
-      @_objectSubscriptionSpecs ?= {}
+    modelSubscriptionSpecs: ->
+      @_modelSubscriptionSpecs ?= {}
 
   klass.init (opts)->
     @elem = if opts.elem then $(opts.elem)[0] else throw("Missing elem!")
-    @obj = opts.obj
+    @model = opts.model
     @delegateEvents()
-    @subscribeToObj() if @obj
+    @subscribeToModel() if @model
     @setClassName()
 
   klass.destroy (opts)->
     @unsetClassName()
-    @unsubscribeToObj() if @obj
+    @unsubscribeToModel() if @model
     @undelegateEvents()
 
   klass.include
@@ -45,7 +45,7 @@ egg.view = (klass)->
       for key, d of @constructor.delegatedEvents()
         $(@elem).on d.domEvent, d.selector, d, (e) =>
           if @delegatedEventsEnabled
-            params = {obj: @obj}
+            params = {model: @model}
             Object.extend(params, e.data.paramsFunc.call(@, e)) if e.data.paramsFunc
             @emit(e.data.eventName, params)
             e.stopPropagation()
@@ -54,22 +54,22 @@ egg.view = (klass)->
     undelegateEvents: ->
       @delegatedEventsEnabled = false
 
-    subscribeToObj: ->
-      for key, s of @constructor.objectSubscriptionSpecs()
+    subscribeToModel: ->
+      for key, s of @constructor.modelSubscriptionSpecs()
         f = ->
           cb = s.callback
           callback = if typeof cb == 'string'
             (args...) => @[cb](args...)
           else
             (args...) => cb.apply(@, args)
-          @objectSubscriptions().push @obj.on(s.eventName, callback)
+          @modelSubscriptions().push @model.on(s.eventName, callback)
         f.call(@)
 
-    unsubscribeToObj: ->
-      sub.cancel() for sub in @objectSubscriptions()
+    unsubscribeToModel: ->
+      sub.cancel() for sub in @modelSubscriptions()
 
-    objectSubscriptions: ->
-      @_objectSubscriptions ?= []
+    modelSubscriptions: ->
+      @_modelSubscriptions ?= []
 
     setClassName: ->
       if @constructor.className
