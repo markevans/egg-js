@@ -36,6 +36,10 @@ egg.model = (klass)->
 
     all: -> @classInstanceVars().all ?= egg.Scope.create(parent: @)
     
+    scope: (name, filter)->
+      @classInstanceVars().scopes = {}
+      @classInstanceVars().scopes[name] ?= egg.Scope.create(parent: @, filter: filter)
+    
     destroyAll: ->
       @instances().forEach (model)-> model.destroy()
 

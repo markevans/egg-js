@@ -1,7 +1,6 @@
 class egg.Scope extends egg.Base
 
   @init (opts={})->
-    @sorter = opts.sorter
     @filter = opts.filter || -> true
     @parent = opts.parent
     throw("Scope needs a parent") unless @parent
@@ -32,6 +31,9 @@ class egg.Scope extends egg.Base
     sub.cancel() for sub in @subs
 
   instances: -> @_instances
+
+  filter: (filter)->
+    @constructor.create(parent: @, filter: filter)
 
   _populateInstances: ->
     @parent.instances().forEach (instance)=>
