@@ -47,6 +47,13 @@ egg.model = (klass)->
       egg.Index.create(modelClass: @, attrNames: attrNames)
 
   klass.delegateTo 'instances', [
+    'has'
+    'toArray'
+    'forEach'
+    'first'
+    'pluck'
+    'asc'
+    'desc'
     'filter'
     'sample'
     'count'
