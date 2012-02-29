@@ -10,6 +10,8 @@ delegate = (object, ownMethod, methods)->
 
 class egg.Base
 
+  ### Class methods ###
+  
   @include: (obj)->
     Object.extend @::, obj
 
@@ -17,10 +19,14 @@ class egg.Base
     Object.extend @, obj
   
   @use: (plugin, args...)->
+    (@classInstanceVars().plugins ?= []).push plugin
     plugin(@, args...)
   
-  @use egg.Events
-
+  @uses: (plugin)->
+    plugins = @classInstanceVars().plugins
+    res = !!plugins && plugins.indexOf(plugin) != -1
+    res
+  
   @sub: (name, definition)->
     throw("invalid class name '#{name}'") unless name.match(/^[A-Z]\w+$/)
     eval("var childClass = function #{name}(){ #{name}.__super__.constructor.apply(this, arguments) }")
@@ -62,6 +68,11 @@ class egg.Base
     @on 'destroy', (params)->
       callback.call(params.instance, params.opts)
 
+  @eggID: ->
+    @name
+
+  ### Instance methods ###
+
   constructor: (opts={})->
     @emit('init', opts: opts, instance: @)
 
@@ -71,8 +82,9 @@ class egg.Base
   className: ->
     @constructor.name
 
-  @eggID: ->
-    @name
-
   eggID: ->
     @_eggID ?= "#{@constructor.name}-#{eggIDCounter++}"
+
+  ### Use some modules ###
+
+  @use egg.Events
