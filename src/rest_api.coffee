@@ -14,7 +14,7 @@ class egg.RestApi extends egg.Base
     url = opts.url || klass.url()
     @get url, opts.params, (data)->
       models = []
-      models.push klass.create(attrs: attrs) for attrs in data
+      models.push klass.load(attrs: attrs) for attrs in data
     , 'load'
 
   save: (model, opts={})->

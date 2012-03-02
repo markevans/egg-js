@@ -16,7 +16,11 @@ egg.model = (klass)->
 
     loadFrom: (storage, opts={})->
       storage.load(@, opts).done (instances) =>
-        @emit('load', from: storage, instances: instances, opts: opts)
+        @emit('load.many', from: storage, instances: instances, opts: opts)
+
+    load: (opts={})->
+      model = @create(opts)
+      @emit('load', instance: model)
 
     where: (attrs)->
       index = egg.Index.for(@, Object.keys(attrs))
