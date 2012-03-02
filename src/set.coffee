@@ -18,8 +18,18 @@ class egg.Set
       delete @items[id]
       delete @array
 
-  count: ->
-    @toArray().length
+  count: (filter)->
+    return @toArray().length unless filter
+    count = 0
+    @forEach (item)->
+      count++ if filter(item)
+    count
+
+  sum: (callback)->
+    sum = 0
+    @forEach (item)->
+      sum += callback(item)
+    sum
 
   has: (item)->
     item.eggID && (item.eggID() of @items)
