@@ -28,7 +28,7 @@ class egg.Set
   sum: (callback)->
     sum = 0
     @forEach (item)->
-      sum += callback(item)
+      sum += parseFloat(callback(item))
     sum
 
   has: (item)->
