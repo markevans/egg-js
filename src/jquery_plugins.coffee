@@ -9,7 +9,7 @@ if @jQuery
     key = keys[0]
     if key
       object[key] ?= {}
-      provide(object[key], keys[1..keys.length-1])
+      provide(object[key], keys.slice(1))
     else
       object
 
