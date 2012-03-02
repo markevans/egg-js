@@ -53,9 +53,19 @@ class egg.Set
   first: ->
     @toArray()[0]
 
-  pluck: (attr)->
+  map: (callbackOrAttr)->
+    if typeof callbackOrAttr == "string"
+      attr = callbackOrAttr
+      callback = (item)->
+        if typeof item[attr] == 'function' then item[attr]() else item[attr]
+    else
+      callback = callbackOrAttr
     array = []
-    array.push model.get(attr) for model in @toArray()
+    @forEach (item) -> array.push callback(item)
+    array
+
+  pluck: (attr)->
+    @map (item) -> item.get(attr)
 
   sample: (attr)->
     array = @toArray()

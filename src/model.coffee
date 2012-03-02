@@ -55,6 +55,7 @@ egg.model = (klass)->
     'toArray'
     'forEach'
     'first'
+    'map'
     'pluck'
     'asc'
     'desc'

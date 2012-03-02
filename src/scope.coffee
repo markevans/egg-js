@@ -51,6 +51,7 @@ class egg.Scope extends egg.Base
     'count'
     'forEach'
     'first'
+    'map'
     'pluck'
     'sample'
     'toJSON'
