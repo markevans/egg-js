@@ -51,13 +51,14 @@ class egg.Publisher
       @runChannelCallbacks(@globalChannel, event) if event.shouldBubble
       true
     
-  on: (name, callback, filter, sender)=>
-    channel = if sender
-      @channels[sender.eggID()] ?= {}
-    else
-      @globalChannel
-    channel[name] ?= []
-    new egg.Subscription(channel[name], callback, filter)
+  on: (names, callback, filter, sender)=>
+    for name in names.split(' ')
+      channel = if sender
+        @channels[sender.eggID()] ?= {}
+      else
+        @globalChannel
+      channel[name] ?= []
+      new egg.Subscription(channel[name], callback, filter)
   
   runChannelCallbacks: (channel, event)->
     if channel
