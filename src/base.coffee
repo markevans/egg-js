@@ -85,6 +85,15 @@ class egg.Base
   eggID: ->
     @_eggID ?= "#{@constructor.name}-#{eggIDCounter++}"
 
+  subscriptions: ->
+    @_subscriptions ?= []
+
+  subscribe: (object, args...)->
+    @subscriptions().push object.on(args...)
+
   ### Use some modules ###
 
   @use egg.Events
+  
+  @destroy ->
+    sub.cancel() for sub in @subscriptions()

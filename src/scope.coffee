@@ -9,11 +9,10 @@ class egg.Scope extends egg.Base
     @_populateInstances()
 
     # Events
-    @subs = []
-    @subs.push @parent.on 'add', (params) =>
+    @subscribe @parent, 'add', (params) =>
       @_add(params.instance) if @filter(params.instance)
       
-    @subs.push @parent.on 'change', (params) =>
+    @subscribe @parent, 'change', (params) =>
       instance = params.instance
       if @filter(instance)
         if @has(instance)
@@ -24,11 +23,8 @@ class egg.Scope extends egg.Base
         if @has(instance)
           @_remove(instance)
       
-    @subs.push @parent.on 'remove', (params) =>
+    @subscribe @parent, 'remove', (params) =>
       @_remove(params.instance) if @has(params.instance)
-
-  @destroy ->
-    sub.cancel() for sub in @subs
 
   instances: -> @_instances
 
