@@ -1,8 +1,7 @@
 describe 'egg.Set', ->
 
   set = null
-  class Bean extends egg.Base
-    @use egg.model
+  class Bean extends egg.Model
 
   describe 'general shermanickans', ->
 

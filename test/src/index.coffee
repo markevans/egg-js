@@ -1,7 +1,6 @@
 describe 'egg.Index', ->
 
-  class window.Pea extends egg.Base
-    @use egg.model
+  class window.Pea extends egg.Model
 
   index = null
 

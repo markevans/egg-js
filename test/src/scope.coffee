@@ -1,7 +1,6 @@
 describe 'egg.Scope', ->
 
-  class TestObject extends egg.Base
-    @use egg.model
+  class TestObject extends egg.Model
 
   describe 'correctly filtering', ->
 

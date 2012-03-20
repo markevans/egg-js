@@ -1,7 +1,6 @@
-describe 'egg.model', ->
+describe 'egg.Model', ->
 
-  class TestModel extends egg.Base
-    @use egg.model
+  class TestModel extends egg.Model
 
   beforeEach ->
     TestModel.destroyAll()
