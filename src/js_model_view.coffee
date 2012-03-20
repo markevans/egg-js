@@ -1,7 +1,5 @@
 egg.jsModelView = (klass)->
 
-  klass.use egg.view
-
   klass.include
 
     subscribeToObj: ->
