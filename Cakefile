@@ -37,6 +37,7 @@ task 'build', 'Build single application file from source files', ->
     'src/index'
     'src/view'
     'src/js_model_view'
+    'src/presenter'
   ], 'lib/egg'
 
 # Minify
@@ -54,4 +55,5 @@ task 'build_tests', 'Build tests from source files', ->
     'test/src/index'
     'test/src/scope'
     'test/src/jquery_plugins'
+    'test/src/presenter'
   ], 'test/tests'

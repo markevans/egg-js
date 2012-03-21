@@ -82,9 +82,3 @@ class egg.Set
     index = Math.floor(Math.random() * array.length)
     model = array[index]
     if attr then model.get(attr) else model
-
-  toJSON: ->
-    array = []
-    @forEach (model) ->
-      array.push model.toJSON()
-    array

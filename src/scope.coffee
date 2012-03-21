@@ -50,7 +50,6 @@ class egg.Scope extends egg.Base
     'map'
     'pluck'
     'sample'
-    'toJSON'
     'asc'
     'desc'
   ]
