@@ -2,6 +2,9 @@ class egg.Presenter extends egg.Base
   
   @init (opts)->
     @presentedItems = opts.present || throw("#{@constructor.name} needs a 'present' option")
+    @onFirstSubscribe ->
+      for name, item of @presentedItems
+        @subscribe item, '*', (params, event) => @emit("#{name}:#{event.name}", params)
   
   @decorate: (className, methodLists...)->
     @jsonGenerators()[className] = (obj)->

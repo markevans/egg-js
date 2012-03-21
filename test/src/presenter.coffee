@@ -52,3 +52,19 @@ describe 'egg.Presenter', ->
       monkey = Monkey.create attrs: {hungry: 'yes'}
       presenter = TestPresenter.create(present: {monkey: monkey})
       expect( presenter.toJSON() ).toEqual monkey: {super: 'yesduper'}
+
+    it "should forward events", ->
+      monkey = Monkey.create attrs: {hungry: 'yes'}
+      presenter = TestPresenter.create(present: {monkey: monkey})
+      spyOn(presenter, 'emit')
+      presenter.on 'anything', ->
+      monkey.set('hungry', 'pig')
+      expect( presenter.emit ).toHaveBeenCalledWith('monkey:change.hungry', instance: monkey, from: 'yes', to: 'pig')
+
+    it "should not forward events if nothing has yet subscribed to it", ->
+      monkey = Monkey.create attrs: {hungry: 'yes'}
+      presenter = TestPresenter.create(present: {monkey: monkey})
+      spyOn(presenter, 'emit')
+      monkey.set('hungry', 'pig')
+      expect( presenter.emit ).not.toHaveBeenCalled()
+      
