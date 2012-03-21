@@ -5,9 +5,6 @@ class egg.Scope extends egg.Base
     @parent = opts.parent
     throw("Scope needs a parent") unless @parent
     
-    @_instances = new egg.Set
-    @_populateInstances()
-
     # Events
     @subscribe @parent, 'add', (params) =>
       @_add(params.instance) if @filter(params.instance)
@@ -26,14 +23,17 @@ class egg.Scope extends egg.Base
     @subscribe @parent, 'remove', (params) =>
       @_remove(params.instance) if @has(params.instance)
 
-  instances: -> @_instances
+  instances: ->
+    if @_instances
+      @_instances
+    else
+      @_instances = new egg.Set
+      @parent.instances().forEach (instance)=>
+        @_instances.add instance if @filter(instance)
+      @_instances
 
   filter: (filter)->
     @constructor.create(parent: @, filter: filter)
-
-  _populateInstances: ->
-    @parent.instances().forEach (instance)=>
-      @instances().add instance if @filter(instance)
 
   _add: (instance)->
     @emit 'add', instance: instance if @instances().add instance
