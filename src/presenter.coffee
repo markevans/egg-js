@@ -2,6 +2,7 @@ class egg.Presenter extends egg.Base
   
   @init (opts)->
     @presentedItems = opts.present || throw("#{@constructor.name} needs a 'present' option")
+    @createReaderMethods()
     @onFirstSubscribe ->
       for name, item of @presentedItems
         @subscribe item, '*', (params, event) => @emit("#{name}:#{event.name}", params)
@@ -43,3 +44,7 @@ class egg.Presenter extends egg.Base
 
   isEnumerable: (obj)->
     !!obj.forEach
+  
+  createReaderMethods: ->
+    for name, item of @presentedItems
+      @[name] = -> @present(item)

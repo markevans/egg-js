@@ -32,6 +32,10 @@ describe 'egg.Presenter', ->
       presenter = TestPresenter.create(present: {chicken: {toJSON: -> ['d', {a: 2}]}})
       expect( presenter.toJSON() ).toEqual chicken: ['d', {a: 2}]
 
+    it "should create a method for each presented item", ->
+      presenter = TestPresenter.create(present: {chicken: {toJSON: -> ['d', {a: 2}]}})
+      expect( presenter.chicken() ).toEqual ['d', {a: 2}]
+
     it "should loop over anything that responds to forEach", ->
       array = [{toJSON: -> 'blah'}, {toJSON: -> 'gurd'}]
       chickens = {forEach: (callback) -> callback(item) for item in array }
