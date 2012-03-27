@@ -49,8 +49,8 @@ class egg.View extends egg.Base
     for key, d of @constructor.delegatedEvents()
       $(@elem).on d.domEvent, d.selector, d, (e) =>
         if @delegatedEventsEnabled
-          params = {presenter: @presenter()}
-          Object.extend(params, e.data.paramsFunc.call(@, e)) if e.data.paramsFunc
+          params = Object.extend({}, @presentedObjects)
+          params.arg = e.data.paramsFunc.call(@, e) if e.data.paramsFunc
           @emit(e.data.eventName, params)
           e.stopPropagation()
           e.preventDefault()
