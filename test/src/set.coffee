@@ -120,3 +120,42 @@ describe 'egg.Set', ->
       set.remove b1
       expect( set.toArray() ).toEqual([b2])
       expect( set.count() ).toEqual(1)
+
+  describe 'events', ->
+    bean = null
+    
+    beforeEach ->
+      bean = Bean.create()
+
+    it "should not emit anything if no-one's listening", ->
+      set = new egg.Set
+      spyOn(set, 'emit')
+      set.add bean
+      expect( set.emit ).not.toHaveBeenCalled()
+
+    it "should emit add if someone's listening", ->
+      set = new egg.Set
+      spyOn(set, 'emit')
+      set.on 'blah', ->
+      set.add bean
+      expect( set.emit ).toHaveBeenCalledWith('add', instance: bean)
+
+    it "should not emit add if already there", ->
+      set = new egg.Set items: [bean]
+      spyOn(set, 'emit')
+      set.on 'blah', ->
+      set.add bean
+      expect( set.emit ).not.toHaveBeenCalled()
+    
+    it "should emit change when notified", ->
+      set = new egg.Set items: [bean]
+      spyOn(set, 'emit')
+      set.on 'blah', ->
+      set.notifyChanged bean, {gar: 'blud'}, {gar: 'booney'}
+      expect( set.emit ).toHaveBeenCalledWith('change', instance: bean, from: {gar: 'blud'}, to: {gar: 'booney'})
+
+    it "should not emit change when notified if nothing is listening", ->
+      set = new egg.Set items: [bean]
+      spyOn(set, 'emit')
+      set.notifyChanged bean, {gar: 'blud'}, {gar: 'booney'}
+      expect( set.emit ).not.toHaveBeenCalled()

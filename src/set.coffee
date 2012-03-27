@@ -1,4 +1,4 @@
-class egg.Set
+class egg.Set extends egg.Base
   
   constructor: (opts={})->
     @items = {}
@@ -11,12 +11,19 @@ class egg.Set
     unless @items[id]
       @items[id] = item
       delete @array
+      @emit 'add', instance: item if @hasSubscribers
+      true
 
   remove: (item)->
     id = item.eggID()
     if @items[id]
       delete @items[id]
       delete @array
+      @emit 'remove', instance: item if @hasSubscribers
+      true
+
+  notifyChanged: (instance, from, to)->
+    @emit 'change', instance: instance, from: from, to: to if @hasSubscribers
 
   count: (filter)->
     return @toArray().length unless filter
