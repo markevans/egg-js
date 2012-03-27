@@ -12,27 +12,26 @@ class egg.View extends egg.Base
   @delegatedEvents: ->
     @_delegatedEvents ?= {}
 
-  @onModel: (eventName, callback)->
-    @modelSubscriptionSpecs()[eventName] =
+  @listen: (eventName, callback)->
+    @presenterSubscriptions()[eventName] =
       eventName: eventName
       callback: callback
 
-  @modelSubscriptionSpecs: ->
-    @_modelSubscriptionSpecs ?= {}
+  @presenterSubscriptions: ->
+    @_presenterSubscriptions ?= {}
 
   # init and destroy
   
   constructor: (opts)->
     @elem = if opts.elem then $(opts.elem)[0] else throw("Missing elem!")
-    @model = opts.model
+    @presentedObjects = opts.present
     @delegateEvents()
-    @subscribeToModel() if @model
+    @subscribeToPresenter()
     @setClassName()
     super
 
   destroy: (opts)->
     @unsetClassName()
-    @unsubscribeToModel() if @model
     @undelegateEvents()
     super
 
@@ -50,7 +49,7 @@ class egg.View extends egg.Base
     for key, d of @constructor.delegatedEvents()
       $(@elem).on d.domEvent, d.selector, d, (e) =>
         if @delegatedEventsEnabled
-          params = {model: @model}
+          params = {presenter: @presenter()}
           Object.extend(params, e.data.paramsFunc.call(@, e)) if e.data.paramsFunc
           @emit(e.data.eventName, params)
           e.stopPropagation()
@@ -59,22 +58,16 @@ class egg.View extends egg.Base
   undelegateEvents: ->
     @delegatedEventsEnabled = false
 
-  subscribeToModel: ->
-    for key, s of @constructor.modelSubscriptionSpecs()
+  subscribeToPresenter: ->
+    for key, s of @constructor.presenterSubscriptions()
       f = ->
         cb = s.callback
         callback = if typeof cb == 'string'
           (args...) => @[cb](args...)
         else
           (args...) => cb.apply(@, args)
-        @modelSubscriptions().push @model.on(s.eventName, callback)
+        @subscribe(@presenter(), s.eventName, callback)
       f.call(@)
-
-  unsubscribeToModel: ->
-    sub.cancel() for sub in @modelSubscriptions()
-
-  modelSubscriptions: ->
-    @_modelSubscriptions ?= []
 
   setClassName: ->
     if @constructor.className
@@ -83,3 +76,9 @@ class egg.View extends egg.Base
   unsetClassName: ->
     if @constructor.className
       $(@elem).removeClass(@constructor.className)
+
+  presenter: ->
+    @_presenter ?= @presenterClass().create objects: @presentedObjects
+
+  presenterClass: ->
+    window[@className().replace(/View$/, 'Presenter')] || egg.Presenter
