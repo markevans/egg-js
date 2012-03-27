@@ -37,24 +37,20 @@ describe 'egg.Index', ->
       pea4 = Pea.create attrs: {zinc: 'farm', apple: 'house'}
 
     it "should be added when one is created", ->
-      expect( index.where(zinc: 1,        apple: 'gog'  ).toArray() ).toEqual([pea1, pea2])
-      expect( index.where(zinc: 'dimble', apple: 'gog'  ).toArray() ).toEqual([pea3])
-      expect( index.where(zinc: 'farm',   apple: 'house').toArray() ).toEqual([pea4])
-      expect( index.where(zinc: 'farm',   apple: 'gog'  ).toArray() ).toEqual([])
+      expect( index.setFor(zinc: 1,        apple: 'gog'  ).toArray() ).toEqual([pea1, pea2])
+      expect( index.setFor(zinc: 'dimble', apple: 'gog'  ).toArray() ).toEqual([pea3])
+      expect( index.setFor(zinc: 'farm',   apple: 'house').toArray() ).toEqual([pea4])
+      expect( index.setFor(zinc: 'farm',   apple: 'gog'  ).toArray() ).toEqual([])
 
     it "should update when one is changed", ->
       pea1.set('zinc', 'farm')
       pea2.set('zinc', 'nuther')
-      expect( index.where(zinc: 1,        apple: 'gog'  ).toArray() ).toEqual([])
-      expect( index.where(zinc: 'dimble', apple: 'gog'  ).toArray() ).toEqual([pea3])
-      expect( index.where(zinc: 'farm',   apple: 'house').toArray() ).toEqual([pea4])
-      expect( index.where(zinc: 'farm',   apple: 'gog'  ).toArray() ).toEqual([pea1])
-      expect( index.where(zinc: 'nuther', apple: 'gog'  ).toArray() ).toEqual([pea2])
+      expect( index.setFor(zinc: 1,        apple: 'gog'  ).toArray() ).toEqual([])
+      expect( index.setFor(zinc: 'dimble', apple: 'gog'  ).toArray() ).toEqual([pea3])
+      expect( index.setFor(zinc: 'farm',   apple: 'house').toArray() ).toEqual([pea4])
+      expect( index.setFor(zinc: 'farm',   apple: 'gog'  ).toArray() ).toEqual([pea1])
+      expect( index.setFor(zinc: 'nuther', apple: 'gog'  ).toArray() ).toEqual([pea2])
 
     it "should update when one is destroyed", ->
       pea2.destroy()
-      expect( index.where(zinc: 1, apple: 'gog'  ).toArray() ).toEqual([pea1])
-
-    it "should find just one", ->
-      expect( index.find(zinc: 1,      apple: 'gog') ).toEqual(pea1)
-      expect( index.find(zinc: 'farm', apple: 'gog') ).toBeUndefined()
+      expect( index.setFor(zinc: 1, apple: 'gog'  ).toArray() ).toEqual([pea1])

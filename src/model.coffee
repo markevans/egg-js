@@ -27,7 +27,7 @@ class egg.Model extends egg.Base
   @where: (attrs)->
     index = egg.Index.for(@, Object.keys(attrs))
     if index
-      index.where(attrs)
+      index.setFor(attrs)
     else
       @filter (model)->
         for key, value of attrs

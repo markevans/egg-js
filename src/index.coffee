@@ -19,14 +19,14 @@ class egg.Index extends egg.Base
   
     # Bind to model changes
     @modelClass.on 'add', (params)=>
-      @add(params.instance, params.instance.attrs())
+      @setFor(params.instance.attrs()).add(params.instance)
     
     @modelClass.on 'change', (params)=>
-      @remove(params.instance, params.from)
-      @add(params.instance, params.to)
+      @setFor(params.to).add(params.instance)
+      @setFor(params.from).remove(params.instance)
 
     @modelClass.on 'remove', (params)=>
-      @remove(params.instance, params.instance.attrs())
+      @setFor(params.instance.attrs()).remove(params.instance)
 
   modelKey: (attrs)->
     values = []
@@ -34,16 +34,5 @@ class egg.Index extends egg.Base
       values.push attrs[key]
     values.join('-')
   
-  find: (attrs)->
-    @where(attrs).first()
-
-  where: (attrs)->
+  setFor: (attrs)->
     @models[@modelKey(attrs)] ?= new egg.Set
-
-  add: (model, attrs)->
-    set = @models[@modelKey(attrs)] ?= new egg.Set
-    set.add(model)
-  
-  remove: (model, attrs)->
-    set = @models[@modelKey(attrs)]
-    set.remove(model) if set
