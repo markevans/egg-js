@@ -12,10 +12,7 @@ describe 'egg.Presenter', ->
     }
     
     @decorate 'Knee',
-      thighBone: -> @hipBone * 2
-  
-    @jsonFor 'Monkey', (monkey)->
-      {super: "#{monkey.get('hungry')}duper"}
+      thighBone: -> @get('hipBone') * 2
   
   class Elbow extends egg.Model
   class Knee extends egg.Model
@@ -25,50 +22,52 @@ describe 'egg.Presenter', ->
 
   describe 'toJSON', ->
     it "should return the items to present", ->
-      presenter = TestPresenter.create(present: {chicken: {big: 'beak'}})
+      presenter = TestPresenter.create(objects: {chicken: {big: 'beak'}})
       expect( presenter.toJSON() ).toEqual chicken: {big: 'beak'}
 
     it "should use toJSON if it's present", ->
-      presenter = TestPresenter.create(present: {chicken: {toJSON: -> ['d', {a: 2}]}})
+      presenter = TestPresenter.create(objects: {chicken: {toJSON: -> ['d', {a: 2}]}})
       expect( presenter.toJSON() ).toEqual chicken: ['d', {a: 2}]
-
-    it "should create a method for each presented item", ->
-      presenter = TestPresenter.create(present: {chicken: {toJSON: -> ['d', {a: 2}]}})
-      expect( presenter.chicken() ).toEqual ['d', {a: 2}]
 
     it "should loop over anything that responds to forEach", ->
       array = [{toJSON: -> 'blah'}, {toJSON: -> 'gurd'}]
       chickens = {forEach: (callback) -> callback(item) for item in array }
-      presenter = TestPresenter.create(present: {chickens: chickens})
+      presenter = TestPresenter.create(objects: {chickens: chickens})
       expect( presenter.toJSON() ).toEqual chickens: ['blah', 'gurd']
 
     it "should decorate any specified objects", ->
       elbow = Elbow.create attrs: {doobie: 'doo'}
-      presenter = TestPresenter.create(present: {elbow: elbow})
+      presenter = TestPresenter.create(objects: {elbow: elbow})
       expect( presenter.toJSON() ).toEqual elbow: {doobie: 'doo', shards: 'blaggard'}
 
     it "should allow giving multiple decoration method lists", ->
       shiny = Shiny.create attrs: {doobie: 'doo'}
-      presenter = TestPresenter.create(present: {shiny: shiny})
+      presenter = TestPresenter.create(objects: {shiny: shiny})
       expect( presenter.toJSON() ).toEqual shiny: {doobie: 'doo', smurf: 'poo', dongle: 'trousers'}
 
-    it "should allow for custom toJSON overrides", ->
-      monkey = Monkey.create attrs: {hungry: 'yes'}
-      presenter = TestPresenter.create(present: {monkey: monkey})
-      expect( presenter.toJSON() ).toEqual monkey: {super: 'yesduper'}
+    it "should call any decoration methods", ->
+      knee = Knee.create attrs: {hipBone: 4}
+      presenter = TestPresenter.create(objects: {knee: knee})
+      expect( presenter.toJSON() ).toEqual knee: {hipBone: 4, thighBone: 8}
 
-    it "should forward events", ->
-      monkey = Monkey.create attrs: {hungry: 'yes'}
-      presenter = TestPresenter.create(present: {monkey: monkey})
-      spyOn(presenter, 'emit')
-      presenter.on 'anything', ->
-      monkey.set('hungry', 'pig')
-      expect( presenter.emit ).toHaveBeenCalledWith('monkey:change.hungry', instance: monkey, from: 'yes', to: 'pig')
+    it "should allow getting json for a specific model", ->
+      knee = Knee.create attrs: {hipBone: 4}
+      presenter = TestPresenter.create(objects: {knee: knee})
+      expect( presenter.present(knee) ).toEqual {hipBone: 4, thighBone: 8}
 
-    it "should not forward events if nothing has yet subscribed to it", ->
-      monkey = Monkey.create attrs: {hungry: 'yes'}
-      presenter = TestPresenter.create(present: {monkey: monkey})
-      spyOn(presenter, 'emit')
-      monkey.set('hungry', 'pig')
-      expect( presenter.emit ).not.toHaveBeenCalled()
+    describe "events", ->
+      it "should forward events", ->
+        monkey = Monkey.create attrs: {hungry: 'yes'}
+        presenter = TestPresenter.create(objects: {monkey: monkey})
+        spyOn(presenter, 'emit')
+        presenter.on 'anything', ->
+        monkey.set('hungry', 'pig')
+        expect( presenter.emit ).toHaveBeenCalledWith('monkey:change.hungry', instance: monkey, from: 'yes', to: 'pig')
+
+      it "should not forward events if nothing has yet subscribed to it", ->
+        monkey = Monkey.create attrs: {hungry: 'yes'}
+        presenter = TestPresenter.create(objects: {monkey: monkey})
+        spyOn(presenter, 'emit')
+        monkey.set('hungry', 'pig')
+        expect( presenter.emit ).not.toHaveBeenCalled()
       

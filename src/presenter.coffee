@@ -1,29 +1,24 @@
 class egg.Presenter extends egg.Base
   
   @init (opts)->
-    @presentedItems = opts.present || throw("#{@constructor.name} needs a 'present' option")
-    @createReaderMethods()
+    @objects = opts.objects || throw("#{@constructor.name} needs an 'objects' option")
     @onFirstSubscribe ->
-      for name, item of @presentedItems
+      for name, item of @objects
         @subscribe item, '*', (params, event) => @emit("#{name}:#{event.name}", params)
   
   @decorate: (className, methodLists...)->
-    @jsonGenerators()[className] = (obj)->
-      Object.extend(obj.toJSON(), methodLists...)
+    @decorators()[className] = Object.extend({}, methodLists...)
 
-  @jsonFor: (className, jsonGenerator)->
-    @jsonGenerators()[className] = jsonGenerator
-  
-  @jsonGenerators: ->
-    @classInstanceVars().jsonGenerators ?= {}
+  @decorators: ->
+    @classInstanceVars().decorators ?= {}
 
-  jsonGeneratorFor: (obj)->
-    @constructor.jsonGenerators()[obj.constructor.name]
+  decoratorFor: (obj)->
+    @constructor.decorators()[obj.constructor.name]
 
   toJSON: ->
     json = {}
-    for name, item of @presentedItems
-      json[name] = @present(item)
+    for name, object of @objects
+      json[name] = @present(object)
     json
 
   present: (obj)->
@@ -33,9 +28,12 @@ class egg.Presenter extends egg.Base
       @presentObject(obj)
   
   presentObject: (obj)->
-    @jsonGeneratorFor(obj)?(obj) ||
-      obj.toJSON?() ||
-      Object.extend({}, obj)
+    hash = obj.toJSON?() || Object.extend({}, obj)
+    decorator = @decoratorFor(obj)
+    if decorator
+      for key, value of decorator
+        hash[key] = (if @isFunction(value) then value.call(obj) else value)
+    hash
 
   presentEnumerable: (obj)->
     json = []
@@ -44,7 +42,6 @@ class egg.Presenter extends egg.Base
 
   isEnumerable: (obj)->
     !!obj.forEach
-  
-  createReaderMethods: ->
-    for name, item of @presentedItems
-      @[name] = -> @present(item)
+
+  isFunction: (value)->
+    typeof value == 'function'
