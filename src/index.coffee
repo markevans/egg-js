@@ -22,8 +22,14 @@ class egg.Index extends egg.Base
       @setFor(params.instance.attrs()).add(params.instance)
     
     @modelClass.on 'change', (params)=>
-      @setFor(params.to).add(params.instance)
-      @setFor(params.from).remove(params.instance)
+      oldSet = @setFor(params.from)
+      newSet = @setFor(params.to)
+      
+      if oldSet == newSet
+        oldSet.notifyChanged(params.instance, params.from, params.to)
+      else
+        oldSet.remove(params.instance)
+        newSet.add(params.instance)
 
     @modelClass.on 'remove', (params)=>
       @setFor(params.instance.attrs()).remove(params.instance)

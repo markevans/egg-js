@@ -54,3 +54,22 @@ describe 'egg.Index', ->
     it "should update when one is destroyed", ->
       pea2.destroy()
       expect( index.setFor(zinc: 1, apple: 'gog'  ).toArray() ).toEqual([pea1])
+
+  describe "changes that don't change the set", ->
+    pea = null
+    
+    beforeEach ->
+      index = egg.Index.create modelClass: Pea, attrNames: ['fruit']
+      pea = Pea.create attrs: {fruit: 'apple', colour: 'red'}
+    
+    it "should belong to the same set", ->
+      expect( index.setFor(fruit: 'apple').toArray() ).toEqual([pea])
+      pea.set(colour: 'green')
+      expect( index.setFor(fruit: 'apple').toArray() ).toEqual([pea])
+
+    it "should notify the set of the change", ->
+      set = index.setFor(fruit: 'apple')
+      spyOn(set, 'notifyChanged')
+      pea.set(colour: 'green')
+      expect( set.notifyChanged ).toHaveBeenCalledWith(pea, {fruit: 'apple', colour: 'red'}, {fruit: 'apple', colour: 'green'})
+      
