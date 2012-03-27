@@ -11,7 +11,7 @@ class egg.Index extends egg.Base
   @init (opts)->
     @modelClass = opts.modelClass
     @attrNames = opts.attrNames.sort()
-    @models = {}
+    @sets = {}
     
     # Add to store of indexes
     @constructor.indexes[@modelClass.name] ?= {}
@@ -28,11 +28,11 @@ class egg.Index extends egg.Base
     @modelClass.on 'remove', (params)=>
       @setFor(params.instance.attrs()).remove(params.instance)
 
-  modelKey: (attrs)->
+  keyFor: (attrs)->
     values = []
     for key in @attrNames
       values.push attrs[key]
     values.join('-')
   
   setFor: (attrs)->
-    @models[@modelKey(attrs)] ?= new egg.Set
+    @sets[@keyFor(attrs)] ?= new egg.Set
