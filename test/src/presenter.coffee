@@ -62,7 +62,7 @@ describe 'egg.Presenter', ->
         spyOn(presenter, 'emit')
         presenter.on 'anything', ->
         monkey.set('hungry', 'pig')
-        expect( presenter.emit ).toHaveBeenCalledWith('monkey:change.hungry', instance: monkey, from: 'yes', to: 'pig')
+        expect( presenter.emit ).toHaveBeenCalledWith('monkey:change:hungry', instance: monkey, from: 'yes', to: 'pig')
 
       it "should not forward events if nothing has yet subscribed to it", ->
         monkey = Monkey.create attrs: {hungry: 'yes'}

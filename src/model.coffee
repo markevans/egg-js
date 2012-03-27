@@ -91,7 +91,7 @@ class egg.Model extends egg.Base
   setOne: (attr, value)->
     from = @get(attr)
     @_attrs[attr] = value
-    @emit "change.#{attr}", instance: @, from: from, to: value
+    @emit "change:#{attr}", instance: @, from: from, to: value
 
   update: (args...)->
     @set(args...)
