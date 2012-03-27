@@ -13,11 +13,19 @@ describe 'egg.Presenter', ->
     
     @decorate 'Knee',
       thighBone: -> @get('hipBone') * 2
+    
+    @decorate 'Monkey',
+      elbows: -> [Elbow.create(attrs: {degrees: 90})]
+  
+    @decorate 'Car', ['doors', 'eggs']
   
   class Elbow extends egg.Model
   class Knee extends egg.Model
   class Shiny extends egg.Model
   class Monkey extends egg.Model
+  class Car
+    doors: -> 5
+    eggs: 6
 
 
   describe 'toJSON', ->
@@ -54,6 +62,14 @@ describe 'egg.Presenter', ->
       knee = Knee.create attrs: {hipBone: 4}
       presenter = TestPresenter.create(objects: {knee: knee})
       expect( presenter.present(knee) ).toEqual {hipBone: 4, thighBone: 8}
+
+    it "should recurse toJSON", ->
+      presenter = TestPresenter.create(objects: {monkey: Monkey.create(attrs: {bananas: 'many'})})
+      expect( presenter.toJSON() ).toEqual {monkey: {bananas: 'many', elbows: [{degrees: 90, shards: 'blaggard'}]}}
+
+    it "should allow specifying an array to use methods on the model", ->
+      presenter = TestPresenter.create(objects: {car: new Car})
+      expect( presenter.toJSON() ).toEqual {car: {doors: 5, eggs: 6}}
 
     describe "events", ->
       it "should forward events", ->

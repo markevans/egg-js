@@ -1,5 +1,14 @@
 class egg.Presenter extends egg.Base
-  
+
+  isEnumerable = (obj)->
+    !!obj.forEach
+
+  isFunction = (value)->
+    typeof value == 'function'
+
+  isObject = (value)->
+    typeof value == 'object'
+
   @init (opts)->
     @objects = opts.objects || throw("#{@constructor.name} needs an 'objects' option")
     @onFirstSubscribe ->
@@ -7,7 +16,14 @@ class egg.Presenter extends egg.Base
         @subscribe item, '*', (params, event) => @emit("#{name}:#{event.name}", params)
   
   @decorate: (className, methodLists...)->
-    @decorators()[className] = Object.extend({}, methodLists...)
+    decorator = {}
+    for methodList in methodLists
+      if isEnumerable(methodList)
+        methodList.forEach (method) ->
+          decorator[method] = -> if isFunction(@[method]) then @[method]() else @[method]
+      else
+        Object.extend decorator, methodList
+    @decorators()[className] = decorator
 
   @decorators: ->
     @classInstanceVars().decorators ?= {}
@@ -22,26 +38,22 @@ class egg.Presenter extends egg.Base
     json
 
   present: (obj)->
-    if @isEnumerable(obj)
+    if isEnumerable(obj)
       @presentEnumerable(obj)
-    else
+    else if isObject(obj)
       @presentObject(obj)
-  
+    else
+      obj
+
   presentObject: (obj)->
     hash = obj.toJSON?() || Object.extend({}, obj)
     decorator = @decoratorFor(obj)
     if decorator
       for key, value of decorator
-        hash[key] = (if @isFunction(value) then value.call(obj) else value)
+        hash[key] = @present(if isFunction(value) then value.call(obj) else value)
     hash
 
   presentEnumerable: (obj)->
     json = []
     obj.forEach (item) => json.push @present(item)
     json
-
-  isEnumerable: (obj)->
-    !!obj.forEach
-
-  isFunction: (value)->
-    typeof value == 'function'
