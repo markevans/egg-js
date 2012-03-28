@@ -10,7 +10,7 @@ class egg.Presenter extends egg.Base
     typeof value == 'object'
 
   @init (opts)->
-    @objects = opts.objects || throw("#{@constructor.name} needs an 'objects' option")
+    @objects = opts.objects || {}
     @onFirstSubscribe ->
       for name, item of @objects
         @subscribe item, '*', (params, event) => @emit("#{name}:#{event.name}", params)
