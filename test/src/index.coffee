@@ -10,17 +10,16 @@ describe 'egg.Index', ->
   describe 'for', ->
     
     beforeEach ->
-      index = egg.Index.create modelClass: Pea, attrNames: ['zinc', 'apple']
+      index = egg.Index.create parent: Pea.all(), attrNames: ['zinc', 'apple']
     
     it "should return null if the index doesn't exist", ->
-      expect(egg.Index.for(Pea, ['doobie', 'do'])).toBeUndefined()
-      expect(egg.Index.for({}, ['zinc, apple'])).toBeUndefined()
+      expect(egg.Index.for(Pea.all(), ['doobie', 'do'])).toBeUndefined()
 
     it "should return the index if it exists", ->
-      expect(egg.Index.for(Pea, ['zinc', 'apple'])).toEqual(index)
+      expect(egg.Index.for(Pea.all(), ['zinc', 'apple'])).toEqual(index)
 
     it "shouldn't care about the order of the attrs", ->
-      expect(egg.Index.for(Pea, ['apple', 'zinc'])).toEqual(index)
+      expect(egg.Index.for(Pea.all(), ['apple', 'zinc'])).toEqual(index)
 
   describe 'auto-adding', ->
 
@@ -30,7 +29,7 @@ describe 'egg.Index', ->
     pea4 = null
 
     beforeEach ->
-      index = egg.Index.create modelClass: Pea, attrNames: ['zinc', 'apple']
+      index = egg.Index.create parent: Pea.all(), attrNames: ['zinc', 'apple']
       pea1 = Pea.create attrs: {zinc: 1, apple: 'gog'}
       pea2 = Pea.create attrs: {zinc: 1, apple: 'gog'}
       pea3 = Pea.create attrs: {zinc: 'dimble', apple: 'gog'}
@@ -59,7 +58,7 @@ describe 'egg.Index', ->
     pea = null
     
     beforeEach ->
-      index = egg.Index.create modelClass: Pea, attrNames: ['fruit']
+      index = egg.Index.create parent: Pea.all(), attrNames: ['fruit']
       pea = Pea.create attrs: {fruit: 'apple', colour: 'red'}
     
     it "should belong to the same set", ->

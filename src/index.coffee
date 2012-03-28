@@ -5,23 +5,23 @@ class egg.Index extends egg.Base
   
   @indexes = {}
   
-  @for: (modelClass, attrNames)->
-    @indexes[modelClass.name]?[rootKeyFor(attrNames)]
+  @for: (parent, attrNames)->
+    @indexes[parent.eggID()]?[rootKeyFor(attrNames)]
   
   @init (opts)->
-    @modelClass = opts.modelClass
+    @parent = opts.parent
     @attrNames = opts.attrNames.sort()
     @sets = {}
     
     # Add to store of indexes
-    @constructor.indexes[@modelClass.name] ?= {}
-    @constructor.indexes[@modelClass.name][rootKeyFor(@attrNames)] = @
+    @constructor.indexes[@parent.eggID()] ?= {}
+    @constructor.indexes[@parent.eggID()][rootKeyFor(@attrNames)] = @
   
     # Bind to model changes
-    @modelClass.on 'add', (params)=>
+    @parent.on 'add', (params)=>
       @setFor(params.instance.attrs()).add(params.instance)
     
-    @modelClass.on 'change', (params)=>
+    @parent.on 'change', (params)=>
       oldSet = @setFor(params.from)
       newSet = @setFor(params.to)
       
@@ -31,7 +31,7 @@ class egg.Index extends egg.Base
         oldSet.remove(params.instance)
         newSet.add(params.instance)
 
-    @modelClass.on 'remove', (params)=>
+    @parent.on 'remove', (params)=>
       @setFor(params.instance.attrs()).remove(params.instance)
 
   keyFor: (attrs)->

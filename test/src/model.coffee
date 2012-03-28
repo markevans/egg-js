@@ -22,7 +22,7 @@ describe 'egg.Model', ->
       expect( set.toArray() ).toEqual([m2, m3])
     
     it "should work when an index exists", ->
-      egg.Index.create(modelClass: TestModel, attrNames: ['log'])
+      egg.Index.create(parent: TestModel.all(), attrNames: ['log'])
       m1 = TestModel.create attrs: log: 'nog'
       m2 = TestModel.create attrs: log: 'noggin'
       m3 = TestModel.create attrs: log: 'noggin'

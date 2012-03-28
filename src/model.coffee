@@ -3,18 +3,21 @@ class egg.Model extends egg.Base
   constructor: (opts)->
     @_attrs = opts.attrs || {}
     @constructor.instances().add(@)
-    @constructor.emit 'add', instance: @
     super
 
   destroy: (opts)->
     @constructor.instances().remove(@)
-    @constructor.emit 'remove', instance: @
     super
 
   # Class methods
 
   @instances: ->
-    @classInstanceVars().instances ?= new egg.Set
+    vars = @classInstanceVars()
+    unless vars.instances
+      vars.instances = new egg.Set
+      @on 'change', (params) ->
+        vars.instances.notifyChanged(params.instance, params.from, params.to)
+    vars.instances
 
   @loadFrom: (storage, opts={})->
     storage.load(@, opts).done (instances) =>
@@ -25,7 +28,7 @@ class egg.Model extends egg.Base
     @emit('load', instance: model)
 
   @where: (attrs)->
-    index = egg.Index.for(@, Object.keys(attrs))
+    index = egg.Index.for(@instances(), Object.keys(attrs))
     if index
       index.setFor(attrs)
     else
@@ -40,17 +43,13 @@ class egg.Model extends egg.Base
   @findOrCreate: (attrs)->
     @find(attrs) || @create(attrs: attrs)
 
-  @all: -> @classInstanceVars().all ?= egg.Scope.create(parent: @)
-  
-  @scope: (name, filter)->
-    @classInstanceVars().scopes = {}
-    @classInstanceVars().scopes[name] ?= egg.Scope.create(parent: @, filter: filter)
+  @all: -> @instances()
   
   @destroyAll: ->
     @instances().forEach (model)-> model.destroy()
 
   @index: (attrNames...)->
-    egg.Index.create(modelClass: @, attrNames: attrNames)
+    egg.Index.create(parent: @instances(), attrNames: attrNames)
 
   @delegateTo 'instances', [
     'has'
