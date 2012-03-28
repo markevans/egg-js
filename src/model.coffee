@@ -49,7 +49,8 @@ class egg.Model extends egg.Base
     @instances().forEach (model)-> model.destroy()
 
   @index: (attrNames...)->
-    egg.Index.create(parent: @instances(), attrNames: attrNames)
+    unless egg.Index.for(@instances(), attrNames)
+      egg.Index.create(parent: @instances(), attrNames: attrNames)
 
   @delegateTo 'instances', [
     'has'
