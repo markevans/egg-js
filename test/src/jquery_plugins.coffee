@@ -15,7 +15,7 @@ describe 'egg jquery plugins', ->
       )
 
     it "should namespace names with brackets yo", ->
-      window.form = $("""
+      form = $("""
         <form>
           <input type="text" name="egg[animal]" value="monkey" />
           <input type="text" name="big[bad][mineral]" value="hunkey" />

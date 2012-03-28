@@ -81,4 +81,4 @@ class egg.View extends egg.Base
     @_presenter ?= @presenterClass().create objects: @presentedObjects
 
   presenterClass: ->
-    window[@className().replace(/View$/, 'Presenter')] || egg.Presenter
+    egg.global[@className().replace(/View$/, 'Presenter')] || egg.Presenter
