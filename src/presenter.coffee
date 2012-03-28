@@ -15,6 +15,16 @@ class egg.Presenter extends egg.Base
       for name, item of @objects
         @subscribe item, '*', (params, event) => @emit("#{name}:#{event.name}", params)
   
+  @includeInJSON: (methodLists...)->
+    @classInstanceVars().extraJSONProperties = Object.extend(
+      {}
+      @classInstanceVars().extraJSONProperties
+      methodLists...
+    )
+  
+  extraJSONProperties: ->
+    @constructor.classInstanceVars().extraJSONProperties || {}
+
   @decorate: (className, methodLists...)->
     decorator = {}
     for methodList in methodLists
@@ -31,8 +41,14 @@ class egg.Presenter extends egg.Base
   decoratorFor: (obj)->
     @constructor.decorators()[obj.constructor.name]
 
-  toJSON: ->
+  extraJSON = (presenter)->
     json = {}
+    for name, attr of presenter.extraJSONProperties()
+      json[name] = (if isFunction(attr) then attr.call(presenter) else attr)
+    json
+
+  toJSON: ->
+    json = extraJSON(@)
     for name, object of @objects
       json[name] = @present(object)
     json

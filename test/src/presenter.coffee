@@ -28,7 +28,7 @@ describe 'egg.Presenter', ->
     eggs: 6
 
 
-  describe 'toJSON', ->
+  describe 'decorators', ->
     it "should return the items to present", ->
       presenter = TestPresenter.create(objects: {chicken: {big: 'beak'}})
       expect( presenter.toJSON() ).toEqual chicken: {big: 'beak'}
@@ -86,4 +86,19 @@ describe 'egg.Presenter', ->
         spyOn(presenter, 'emit')
         monkey.set('hungry', 'pig')
         expect( presenter.emit ).not.toHaveBeenCalled()
+
+    describe 'includeInJSON', ->
+      class DogPresenter extends egg.Presenter
+        @includeInJSON
+          one: 1
+          two: -> @objects.dog.legs / 2
+      presenter = null
       
+      beforeEach ->
+        presenter = DogPresenter.create objects: {dog: {legs: 4}}
+
+      it "should include specified attributes", ->
+        expect( presenter.toJSON().one ).toEqual(1)
+
+      it "should include specified methods and call them", ->
+        expect( presenter.toJSON().two ).toEqual(2)
