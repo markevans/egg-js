@@ -87,18 +87,15 @@ class egg.Model extends egg.Base
       @setOne(attr, value)
     to = @attrs()
     @emit 'change', instance: @, from: from, to: to
+    @
   
   setOne: (attr, value)->
     from = @get(attr)
     @_attrs[attr] = value
     @emit "change:#{attr}", instance: @, from: from, to: value
 
-  update: (args...)->
-    @set(args...)
-    @save()
-
-  save: ->
-    @emit('save', instance: @)
+  commit: ->
+    @emit('commit', instance: @)
 
   toJSON: ->
     Object.extend {}, @_attrs
