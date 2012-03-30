@@ -74,11 +74,11 @@ class egg.RestApi extends egg.Base
       .done (data) =>
         successCallback(data) if successCallback
         deferred.resolve(data: data)
-        @emit("#{eventPrefix}.success", data: data)
-        @emit("request.success", type: eventPrefix, data: data)
+        @emit("#{eventPrefix}:success", data: data)
+        @emit("request:success", type: eventPrefix, data: data)
       .fail (jqXhr, status, errors) =>
         deferred.reject(status: status, errors: errors)
-        @emit("#{eventPrefix}.error", status: status, errors: errors)
-        @emit("request.error", type: eventPrefix, status: status, errors: errors)
+        @emit("#{eventPrefix}:error", status: status, errors: errors)
+        @emit("request:error", type: eventPrefix, status: status, errors: errors)
     
     deferred.promise()

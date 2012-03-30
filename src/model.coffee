@@ -21,7 +21,7 @@ class egg.Model extends egg.Base
 
   @loadFrom: (storage, opts={})->
     storage.load(@, opts).done (instances) =>
-      @emit('load.many', from: storage, instances: instances, opts: opts)
+      @emit('load:many', from: storage, instances: instances, opts: opts)
 
   @load: (opts={})->
     model = @create(opts)
