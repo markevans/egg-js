@@ -4,6 +4,10 @@ class egg.Model extends egg.Base
     @_attrs = opts.attrs || {}
     @constructor.instances().add(@)
     super
+    if opts.loaded
+      @emit 'load', instance: @
+    else
+      @emit 'new', instance: @
 
   destroy: (opts)->
     @constructor.instances().remove(@)
@@ -24,8 +28,8 @@ class egg.Model extends egg.Base
       @emit('load:many', from: storage, instances: instances, opts: opts)
 
   @load: (opts={})->
-    model = @create(opts)
-    @emit('load', instance: model)
+    opts.loaded = true
+    @create(opts)
 
   @where: (attrs)->
     index = egg.Index.for(@instances(), Object.keys(attrs))
