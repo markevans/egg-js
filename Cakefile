@@ -31,6 +31,7 @@ task 'build', 'Build single application file from source files', ->
     'src/base'
     'src/set'
     'src/rest_api'
+    'src/datastore'
     'src/model'
     'src/active_record'
     'src/index'
@@ -54,4 +55,5 @@ task 'build_tests', 'Build tests from source files', ->
     'test/src/index'
     'test/src/jquery_plugins'
     'test/src/presenter'
+    'test/src/datastore'
   ], 'test/tests'
