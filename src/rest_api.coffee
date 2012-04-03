@@ -11,11 +11,16 @@ class egg.RestApi extends egg.Base
   # Model related methods
 
   load: (klass, opts={})->
+    deferred = $.Deferred()
+    
     url = opts.url || klass.url()
     @get url, opts.params, (data)->
       models = []
       models.push klass.load(attrs: attrs) for attrs in data
+      deferred.resolve(models)
     , 'load'
+
+    deferred.promise()
 
   save: (model, opts={})->
     if model.isPersisted()
