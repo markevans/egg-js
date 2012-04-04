@@ -13,3 +13,6 @@ Object.isEmpty = (obj)->
   for key of obj
     return false if obj.hasOwnProperty(key)
   true
+
+RegExp.escape = (text)->
+  text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&")

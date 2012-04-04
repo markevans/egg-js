@@ -57,4 +57,5 @@ task 'build_tests', 'Build tests from source files', ->
     'test/src/jquery_plugins'
     'test/src/presenter'
     'test/src/datastore'
+    'test/src/router'
   ], 'test/tests'
