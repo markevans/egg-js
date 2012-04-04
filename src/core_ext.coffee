@@ -8,3 +8,8 @@ Object.slice = (obj, keys)->
   for key in keys
     newObj[key] = obj[key]
   newObj
+
+Object.isEmpty = (obj)->
+  for key of obj
+    return false if obj.hasOwnProperty(key)
+  true
