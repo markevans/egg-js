@@ -15,7 +15,11 @@ class Route
       paramNames.push matches[1]
       pattern = pattern.replace(tokenPattern, '([\\w_]+)')
     # Allow for a query string
-    pattern = pattern.replace('\\#','(?:\\?.*)?#')
+    queryPattern = '(?:\\?[^#]*)?'
+    pattern = if pattern.match('\\#')
+      pattern.replace('\\#', queryPattern+'#')
+    else
+      pattern + queryPattern
     [new RegExp("^#{pattern}$"), paramNames]
   
   constructor: (@name, @pattern)->
@@ -53,27 +57,35 @@ class egg.Router extends egg.Base
 
   @init (opts={})->
     @window = opts.window || window
+    
     if opts.routes
       @routes = {}
       @routes[name] = new Route(name, pattern) for name, pattern of opts.routes
     else
       throw("Router needs a 'routes' option!")
+    
+    @window.onpopstate = => @run()
 
   bookmark: (action, params={})->
     route = @routes[action]
     if route
       @window.history.pushState({}, "", route.toURL(params))
 
+  run: (url=@currentURL())->
+    console.log "Finding a match for url", url
+    route = @routeFor(url)
+    if route
+      console.log "found", route.name
+      @emit("route:#{route.name}", route.paramsFor(url))
+    else
+      console.log "nothing found"
+
   paramsFor: (url)->
     @routeFor(url)?.paramsFor(url)
 
-  runURL: (url=@currentURL())->
-    route = @routeFor(url)
-    if route
-      @emit("route:#{route.name}", route.paramsFor(url))
-
   currentURL: ->
-    @window.location + @window.search + @window.hash
+    l = @window.location
+    l.pathname + l.search + l.hash
 
   routeFor: (url)->
     for name, route of @routes
