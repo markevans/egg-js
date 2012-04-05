@@ -31,48 +31,48 @@ class Route
       params[paramNames[i]] = group
     params
 
-  urlParts = (url)->
-    [serverBit, hash] = url.split('#')
-    [path, query] = serverBit.split('?')
-    [path, query, hash]
-  
-  constructor: (@name, @pattern)->
-    [@path, @hash] = @pattern.split('#')
-    [@pathMatcher, @pathParamNames] = compile(@path) if @path
-    [@hashMatcher, @hashParamNames] = compile(@hash) if @hash
+  constructor: (@name, pattern)->
+    if pattern[0] == '#'
+      @usesHash = true
+      @pattern = pattern.slice(1)
+    else
+      @usesHash = false
+      @pattern = pattern
+    
+    [@matcher, @paramNames] = compile(@pattern)
 
   toURL: (params)->
-    path = @path
+    pattern = @pattern
     query = {}
-    hash = @hash
     for key, value of params
       token = ':' + key
-      if path.match(token)
-        path = path.replace(token, value)
-      else if hash?.match(token)
-        hash = hash.replace(token, value)
+      if pattern.match(token)
+        pattern = pattern.replace(token, value)
       else
         query[key] = value
-    url = path
+    url = ""
+    url += "#" if @usesHash
+    url += pattern
     url += "?#{queryString(query)}" unless Object.isEmpty(query)
-    url += "##{hash}" if hash
     url
 
   matches: (url)->
-    [path, query, hash] = urlParts(url)
-    return false if !!path != !!@path
-    return false if !!hash != !!@hash
-    return false if path && !@pathMatcher.test(path)
-    return false if hash && !@hashMatcher.test(hash)
-    true
+    [path, query] = @urlParts(url)
+    @matcher.test(path)
 
   paramsFor: (url)->
-    [path, query, hash] = urlParts(url)
+    [path, query] = @urlParts(url)
     params = {}
-    Object.extend params, extractParams(path, @pathMatcher, @pathParamNames) if path
-    Object.extend params, extractParams(hash, @hashMatcher, @hashParamNames) if hash
+    Object.extend params, extractParams(path, @matcher, @paramNames)
     Object.extend params, parseQuery(query) if query
     params
+
+  urlParts: (url)->
+    [serverBit, hash] = url.split('#')
+    if @usesHash
+      (hash || "").split('?')
+    else
+      (serverBit || "").split('?')
 
 class egg.Router extends egg.Base
 
