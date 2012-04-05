@@ -1,30 +1,45 @@
 class Route
 
+  tokenPattern = /:([\w_]+)/
+
   queryString = (params)->
     parts = []
     for key, value of params
       parts.push("#{encodeURIComponent(key)}=#{encodeURIComponent(value)}")
     parts.join('&')
 
+  parseQuery = (query)->
+    params = {}
+    for part in query.split('&')
+      [key, value] = part.split('=')
+      params[key] = value
+    params
+
   compile = (pattern)->
     pattern = RegExp.escape(pattern)
-    tokenPattern = /:([\w_]+)/
     # Regexify all the ":token" parts and record their names
     paramNames = []
     while matches = pattern.match(tokenPattern)
       paramNames.push matches[1]
       pattern = pattern.replace(tokenPattern, '([\\w_]+)')
-    # Allow for a query string
-    queryPattern = '(?:\\?[^#]*)?'
-    pattern = if pattern.match('\\#')
-      pattern.replace('\\#', queryPattern+'#')
-    else
-      pattern + queryPattern
     [new RegExp("^#{pattern}$"), paramNames]
+
+  extractParams = (string, matcher, paramNames)->
+    params = {}
+    matches = matcher.exec(string)
+    for group, i in matches[1..matches.length]
+      params[paramNames[i]] = group
+    params
+
+  urlParts = (url)->
+    [serverBit, hash] = url.split('#')
+    [path, query] = serverBit.split('?')
+    [path, query, hash]
   
   constructor: (@name, @pattern)->
     [@path, @hash] = @pattern.split('#')
-    [@matcher, @paramNames] = compile(@pattern)
+    [@pathMatcher, @pathParamNames] = compile(@path) if @path
+    [@hashMatcher, @hashParamNames] = compile(@hash) if @hash
 
   toURL: (params)->
     path = @path
@@ -44,15 +59,21 @@ class Route
     url
 
   matches: (url)->
-    @matcher.test(url)
+    [path, query, hash] = urlParts(url)
+    return false if !!path != !!@path
+    return false if !!hash != !!@hash
+    return false if path && !@pathMatcher.test(path)
+    return false if hash && !@hashMatcher.test(hash)
+    true
 
   paramsFor: (url)->
+    [path, query, hash] = urlParts(url)
     params = {}
-    matches = @matcher.exec(url)
-    for group, i in matches[1..matches.length]
-      params[@paramNames[i]] = group
+    Object.extend params, extractParams(path, @pathMatcher, @pathParamNames) if path
+    Object.extend params, extractParams(hash, @hashMatcher, @hashParamNames) if hash
+    Object.extend params, parseQuery(query) if query
     params
-    
+
 class egg.Router extends egg.Base
 
   @init (opts={})->
@@ -72,13 +93,9 @@ class egg.Router extends egg.Base
       @window.history.pushState({}, "", route.toURL(params))
 
   run: (url=@currentURL())->
-    console.log "Finding a match for url", url
     route = @routeFor(url)
     if route
-      console.log "found", route.name
       @emit("route:#{route.name}", route.paramsFor(url))
-    else
-      console.log "nothing found"
 
   paramsFor: (url)->
     @routeFor(url)?.paramsFor(url)
