@@ -2,11 +2,11 @@ class egg.View extends egg.Base
   
   # Class methods
   
-  @onDOM: (selector, domEvent, eventName, paramsFunc)->
+  @onDOM: (selector, domEvent, handlerMethod, paramsFunc)->
     @delegatedEvents()["#{domEvent}-#{selector}"] =
       domEvent: domEvent
       selector: selector
-      eventName: eventName
+      handlerMethod: handlerMethod
       paramsFunc: paramsFunc
 
   @delegatedEvents: ->
@@ -26,6 +26,7 @@ class egg.View extends egg.Base
     @elem = if opts.elem then $(opts.elem)[0] else throw("Missing elem!")
     @presentedObjects = opts.present
     @_presenter = opts.presenter
+    @_handler = opts.handler
     @delegateEvents()
     @subscribeToPresenter()
     @setClassName()
@@ -50,9 +51,9 @@ class egg.View extends egg.Base
         if @delegatedEventsEnabled
           e.stopPropagation()
           e.preventDefault()
-          params = Object.extend({}, @presentedObjects)
-          params.arg = e.data.paramsFunc.call(@, e) if e.data.paramsFunc
-          @emit(e.data.eventName, params)
+          params = e.data.paramsFunc.call(@, e) if e.data.paramsFunc
+          @[e.data.handlerMethod]?(e)                 # Call method on self if it exists
+          @handler()?[e.data.handlerMethod]?(params)  # Call method on handler if it exists
 
   undelegateEvents: ->
     @delegatedEventsEnabled = false
@@ -85,3 +86,11 @@ class egg.View extends egg.Base
           (args...) => cb.apply(@, args)
         @subscribe(@presenter(), s.eventName, callback)
       f.call(@)
+
+  # Handler stuff
+
+  handler: ->
+    @_handler ?= @handlerClass()?.create(objects: @presentedObjects)
+
+  handlerClass: ->
+    egg.global[@className().replace(/View$/, 'Handler')]

@@ -38,6 +38,7 @@ task 'build', 'Build single application file from source files', ->
     'src/view'
     'src/js_model_view'
     'src/presenter'
+    'src/handler'
     'src/router'
   ], 'lib/egg'
 
