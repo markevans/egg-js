@@ -25,6 +25,7 @@ class egg.View extends egg.Base
   constructor: (opts)->
     @elem = if opts.elem then $(opts.elem)[0] else throw("Missing elem!")
     @presentedObjects = opts.present
+    @_presenter = opts.presenter
     @delegateEvents()
     @subscribeToPresenter()
     @setClassName()
@@ -34,8 +35,6 @@ class egg.View extends egg.Base
     @unsetClassName()
     @undelegateEvents()
     super
-
-  # Instance methods
   
   $: (selector)->
     $(@elem).find(selector)
@@ -49,14 +48,32 @@ class egg.View extends egg.Base
     for key, d of @constructor.delegatedEvents()
       $(@elem).on d.domEvent, d.selector, d, (e) =>
         if @delegatedEventsEnabled
+          e.stopPropagation()
+          e.preventDefault()
           params = Object.extend({}, @presentedObjects)
           params.arg = e.data.paramsFunc.call(@, e) if e.data.paramsFunc
           @emit(e.data.eventName, params)
-          e.stopPropagation()
-          e.preventDefault()
 
   undelegateEvents: ->
     @delegatedEventsEnabled = false
+
+  # classname stuff
+
+  setClassName: ->
+    if @constructor.className
+      $(@elem).addClass(@constructor.className)
+
+  unsetClassName: ->
+    if @constructor.className
+      $(@elem).removeClass(@constructor.className)
+
+  # Presenter stuff
+
+  presenter: ->
+    @_presenter ?= @presenterClass().create objects: @presentedObjects
+
+  presenterClass: ->
+    egg.global[@className().replace(/View$/, 'Presenter')] || egg.Presenter
 
   subscribeToPresenter: ->
     for key, s of @constructor.presenterSubscriptions()
@@ -68,17 +85,3 @@ class egg.View extends egg.Base
           (args...) => cb.apply(@, args)
         @subscribe(@presenter(), s.eventName, callback)
       f.call(@)
-
-  setClassName: ->
-    if @constructor.className
-      $(@elem).addClass(@constructor.className)
-
-  unsetClassName: ->
-    if @constructor.className
-      $(@elem).removeClass(@constructor.className)
-
-  presenter: ->
-    @_presenter ?= @presenterClass().create objects: @presentedObjects
-
-  presenterClass: ->
-    egg.global[@className().replace(/View$/, 'Presenter')] || egg.Presenter
