@@ -24,11 +24,14 @@ module Builder
     TEST_FILES = Dir['test/src/*.coffee']
     
     def build
-      js = `coffee --print --join --compile #{SRC_FILES.join(' ')}`
-      js.sub!(/\.call\(this\);\s*\z/, '')
+      src_function = `coffee --print --join --compile #{SRC_FILES.join(' ')}`
+      src_function.sub!(
+        /\}\)\.call\(this\);\s*\z/,
+        "  return egg;\n})"
+      )
       
       File.open('lib/egg.js', 'w') do |f|
-        f.write amdify(js)
+        f.write amdify(src_function)
       end
     end
     
@@ -45,7 +48,7 @@ var src = #{src_function};
 if(this.define && this.define.amd){
   define(src);
 } else {
-  src();
+  this.egg = src();
 }
 })();
 """

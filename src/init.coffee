@@ -1,3 +1,3 @@
-@egg = {
+egg = {
   global: @
 }
