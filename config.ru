@@ -1,13 +1,15 @@
+require File.expand_path('../builder', __FILE__)
+
 class Server
 
   def call(env)
 
     case env['PATH_INFO']
     when '/egg.js'
-      `cake build`
+      Builder.build
       js_response File.read('lib/egg.js')
     when '/tests.js'
-      `cake build_tests`
+      Builder.build_tests
       js_response File.read('test/tests.js')
     else
       not_found_response
